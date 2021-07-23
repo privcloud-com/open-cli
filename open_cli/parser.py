@@ -20,7 +20,7 @@ class CommandParser:
 
         # Separate elements into attributes and arguments
         for element in elements:
-            if element.startswith('-'):
+            if element.startswith("-"):
                 raw_arguments.append(element)
             else:
                 attributes.append(element)
@@ -34,28 +34,54 @@ class CommandParser:
         """Return the required operation based on the attribute list."""
         obj = self.client
 
-        for attribute in attributes:
-            sub_obj = getattr(obj, attribute, None)
-            if sub_obj is None:
-                raise ValueError("Illegal operation %r" % attributes)
-            obj = sub_obj
+        obj_operation_map = obj._operation_map
+        len_attr = len(attributes)
+        obj_meth_attr = None
 
-        return obj
+        if len_attr == 1:
+            obj_meth_attr = attributes[0]
+            if obj_meth_attr not in obj_operation_map.keys():
+                raise ValueError(
+                    "Wrong <object/method> for PrivCloud API: <%s>" % obj_meth_attr
+                )
+            operation = obj._get_callable(obj_operation_map[obj_meth_attr].request)
+        else:
+            raise ValueError("Too many or none attributes <%r>" % attributes)
+
+        return operation
 
     def get_arguments_dict(self, raw_arguments):
-        """Convert a list of raw arguments into a dictionary format."""
-        arguments = {}
-
+        arguments, data = {}, {}
+        first_symb, last_symb = "[", "]"
         for raw_argument in raw_arguments:
             striped_argument = raw_argument.lstrip("-")
+            is_req_body_arg = False
 
+            if "body" in striped_argument:
+                is_req_body_arg = True
+                prefix = "body." if not striped_argument.startswith("body=") else "body"
+                striped_argument = striped_argument.removeprefix(prefix)
             if "=" in striped_argument:
                 full_path, value = striped_argument.split("=")
             else:
                 full_path, value = striped_argument, "True"
-
-            self.set_nested(arguments, value, *full_path.split('.'))
-
+            if first_symb and last_symb in value:
+                value = [
+                    x.strip()
+                    for x in value.replace(first_symb, "")
+                    .replace(last_symb, "")
+                    .split(",")
+                ]
+            if is_req_body_arg:
+                if isinstance(value, str) and value.isnumeric():
+                    value = int(value)
+                if not full_path:
+                    data = value
+                else:
+                    data[full_path] = value
+            else:
+                self.set_nested(arguments, value, *full_path.split("."))
+        arguments = {"parameters": arguments, "data": data}
         return arguments
 
     @staticmethod

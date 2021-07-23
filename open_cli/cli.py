@@ -3,17 +3,19 @@
 import os
 import logging
 import warnings
-
-from bravado.client import SwaggerClient
+import requests
+import yaml
 
 from prompt_toolkit import prompt
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+from pyfiglet import print_figlet
 
 from . import help
 from . import parser
 from . import completer
 from . import formatter
+from .openapi_extension import OpenAPIExt
 
 # Suppress bravado warnings
 warnings.filterwarnings("ignore")
@@ -22,32 +24,32 @@ warnings.filterwarnings("ignore")
 class OpenCLI:
     """CLI processor."""
 
-    def __init__(self, source, history_path, output_format=formatter.JSON, headers=None):
+    def __init__(
+        self, source, history_path, output_format=formatter.JSON, headers=None
+    ):
         """Initialize the CLI processor."""
         self.history_path = history_path
         self.output_format = output_format
 
         self.logger = logging.getLogger("open-cli")
-        self.logger.debug("Creating a python client based on %s, headers: %s", source, headers)
+        self.logger.debug(
+            "Creating a python client based on %s, headers: %s", source, headers
+        )
 
         headers = self._parse_headers(headers)
 
         # Handle non-url sources
+        spec = None
         if os.path.exists(source):
-            source = "file://" + source
+            with open(source) as f:
+                spec = yaml.safe_load(f.read())
 
-        self.client = SwaggerClient.from_url(
-            source,
-            request_headers=headers,
-            config={
-                'use_models': False,
-                'validate_responses': False,
-                'validate_swagger_spec': False,
-            }
-        )
+        if not spec:
+            spec = requests.get(source).json()
+        self.client = OpenAPIExt(spec)
 
         # Get the CLI prompt name from the spec title
-        self.name = self.client.swagger_spec.spec_dict["info"].get("title", u"Open-CLI")
+        self.name = self.client.info.title
 
         # Initialize a command parser based on the client
         self.command_parser = parser.CommandParser(client=self.client)
@@ -56,6 +58,7 @@ class OpenCLI:
         """Run the CLI loop."""
         history = FileHistory(self.history_path)
         command_completer = completer.CommandCompleter(client=self.client)
+        print_figlet("PrivCloud", font="starwars", width=100)
 
         while True:
 
@@ -76,6 +79,15 @@ class OpenCLI:
 
     def execute(self, command):
         """Parse and execute the given command."""
+        self.logger.debug("Invoke authentication")
+        try:
+            with open("current_auth_token.txt") as f:
+                access_token = f.read()
+                if access_token:
+                    for k in self.client.components.securitySchemes.keys():
+                        self.client.authenticate(k, access_token)
+        except FileNotFoundError as e:
+            self.logger.debug(str(e))
         self.logger.debug("Parsing the input text %s", command)
         operation, arguments = self.command_parser.parse(text=command)
 
@@ -84,8 +96,23 @@ class OpenCLI:
             return help.show(operation)
 
         self.logger.debug("Invoke operation %s with arguments %s", operation, arguments)
-        response = operation(**arguments).result()
+        response = operation(**arguments)
 
+        if not isinstance(response, list):
+            if hasattr(response, "_raw_data"):
+                access_token = response._raw_data.get("access_token")
+                expires_at = response._raw_data.get("expires_at")
+                if access_token and expires_at:
+                    with open("current_auth_token.txt", "w") as f:
+                        f.seek(0)
+                        f.write(access_token)
+                        f.truncate()
+
+        if isinstance(response, list):
+            response = [r._raw_data for r in response]
+        else:
+            if hasattr(response, "_raw_data"):
+                response = response._raw_data
         self.logger.debug("Formatting response %s", response)
         print(formatter.format_response(response, output_format=self.output_format))
 
@@ -98,5 +125,5 @@ class OpenCLI:
             raise ValueError("Invalid headers %s" % headers)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     OpenCLI("http://petstore.swagger.io/v2/swagger.json").run_loop()

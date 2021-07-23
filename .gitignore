@@ -90,8 +90,12 @@ ENV/
 # PyCharm
 .idea/
 
+# vscode
+.vscode/
+
 open_cli/history.txt
 
 AUTHORS
 ChangeLog
 history.txt
+current_auth_token.txt

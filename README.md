@@ -8,17 +8,18 @@ From the OpenAPI Specification project:
 
 ## Demo
 
-![Alt Text](https://github.com/sharbov/open-cli/blob/master/demo.gif)
+![Alt Text](https://github.com/privcloud-com/open-cli/blob/master/demo.gif)
+![Alt Text](https://github.com/privcloud-com/open-cli/blob/master/demo_table.gif)
 
 ## Docker
 
 To start a CLI session run:
 
-    docker run -it sharbov/open-cli <swagger-spec-url>
+    docker run -it privcloud-com/open-cli <swagger-spec-url>
 
 e.g:
 
-    docker run -it sharbov/open-cli http://petstore.swagger.io/v2/swagger.json
+    docker run -it privcloud-com/open-cli http://petstore.swagger.io/v3/swagger.json
 
 ## Python
 
@@ -36,7 +37,7 @@ To start a CLI session run:
 
 e.g:
 
-    open-cli http://petstore.swagger.io/v2/swagger.json
+    open-cli https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/examples/v3.0/petstore-expanded.json
 
 For more options run:
 
@@ -44,4 +45,4 @@ For more options run:
 
 Credits
 -------
-This project relies on Yelps [bravado](https://github.com/Yelp/bravado) project & on Jonathan Slenders [python-prompt-toolkit](https://github.com/jonathanslenders/python-prompt-toolkit).
+This project relies on OpenApi3 [openapi3](https://github.com/Dorthu/openapi3) project & on Jonathan Slenders [python-prompt-toolkit](https://github.com/jonathanslenders/python-prompt-toolkit).

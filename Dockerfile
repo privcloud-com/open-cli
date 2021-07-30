@@ -25,7 +25,7 @@ RUN python setup.py sdist && mv dist/opencli*.tar.gz dist/opencli3.tar.gz
 FROM python:3.6-alpine AS release
 
 # Set entrypoint
-ENTRYPOINT ["open-cli"]
+ENTRYPOINT ["open-cli3"]
 
 # Copy & install package requirements
 ADD requirements.txt /requirements.txt

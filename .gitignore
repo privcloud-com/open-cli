@@ -93,7 +93,7 @@ ENV/
 # vscode
 .vscode/
 
-open_cli/history.txt
+open_cli3/history.txt
 
 AUTHORS
 ChangeLog

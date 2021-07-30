@@ -5,7 +5,7 @@ import argparse
 from . import cli
 from . import formatter
 
-HISTORY_PATH = os.path.join(os.path.expanduser("~"), ".open-cli")
+HISTORY_PATH = os.path.join(os.path.expanduser("~"), ".open-cli3")
 
 
 def main():

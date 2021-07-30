@@ -31,7 +31,7 @@ class OpenCLI:
         self.history_path = history_path
         self.output_format = output_format
 
-        self.logger = logging.getLogger("open-cli")
+        self.logger = logging.getLogger("open-cli3")
         self.logger.debug(
             "Creating a python client based on %s, headers: %s", source, headers
         )

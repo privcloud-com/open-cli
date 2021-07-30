@@ -15,11 +15,11 @@ From the OpenAPI Specification project:
 
 To start a CLI session run:
 
-    docker run -it privcloud-com/open-cli <swagger-spec-url>
+    docker run -it privcloud-com/open-cli3 <swagger-spec-url>
 
 e.g:
 
-    docker run -it privcloud-com/open-cli http://petstore.swagger.io/v3/swagger.json
+    docker run -it privcloud-com/open-cli3 http://petstore.swagger.io/v3/swagger.json
 
 ## Python
 
@@ -33,15 +33,15 @@ To install OpenCLI, simply:
 
 To start a CLI session run:
 
-    open-cli <swagger-spec-url>
+    open-cli3 <swagger-spec-url>
 
 e.g:
 
-    open-cli https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/examples/v3.0/petstore-expanded.json
+    open-cli3 https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/examples/v3.0/petstore-expanded.json
 
 For more options run:
 
-    open-cli -h
+    open-cli3 -h
 
 Credits
 -------

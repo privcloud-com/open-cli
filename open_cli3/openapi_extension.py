@@ -1,3 +1,4 @@
+from openapi3.components import Components
 from openapi3.general import Reference
 from openapi3.openapi import OpenAPI
 from openapi3.paths import MediaType, Path, Operation, Parameter, RequestBody, Response

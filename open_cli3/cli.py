@@ -25,11 +25,12 @@ class OpenCLI:
     """CLI processor."""
 
     def __init__(
-        self, source, history_path, output_format=formatter.JSON, headers=None
+        self, source, history_path, output_format=formatter.JSON, headers=None, print_request_time=False
     ):
         """Initialize the CLI processor."""
         self.history_path = history_path
         self.output_format = output_format
+        self.print_request_time = print_request_time
 
         self.logger = logging.getLogger("open-cli3")
         self.logger.debug(
@@ -115,6 +116,8 @@ class OpenCLI:
                 response = response._raw_data
         self.logger.debug("Formatting response %s", response)
         print(formatter.format_response(response, output_format=self.output_format))
+        if self.print_request_time:
+            print(f"Request time: {self.client.request_time_sec} seconds")
 
     @staticmethod
     def _parse_headers(headers):

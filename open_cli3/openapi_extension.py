@@ -308,6 +308,9 @@ class OperationExt(Operation, ObjectBase):
         # send the prepared request
         result = self._session.send(self._request.prepare())
 
+        # save request time in sec
+        setattr(self._root, 'request_time_sec', result.elapsed.total_seconds())
+
         # spec enforces these are strings
         status_code = str(result.status_code)
 

@@ -1,6 +1,7 @@
 import os
 import logging
 import argparse
+from distutils.util import strtobool
 
 from . import cli
 from . import formatter
@@ -35,6 +36,12 @@ def main():
         default=[],
         help="requests headers, usage: --header x-header-1:val-1 x-header-2:val2",
     )
+    args_parser.add_argument(
+        "--print-request-time",
+        type=strtobool,
+        default=False,
+        help="Show time of each request if this flag set to true",
+    )
 
     args = args_parser.parse_args()
 
@@ -45,6 +52,7 @@ def main():
         history_path=args.history,
         output_format=args.format,
         headers=args.header,
+        print_request_time=args.print_request_time,
     )
 
     if args.command:

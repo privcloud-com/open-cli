@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """Open-CLI."""
 import os
+import configparser
 import logging
 import warnings
 import requests
@@ -20,17 +21,22 @@ from .openapi_extension import OpenAPIExt
 # Suppress bravado warnings
 warnings.filterwarnings("ignore")
 
+DEFAULT_SECTION = "DEFAULT"
+CONFIG_OPTIONS = {0: "endpoint", 1: "access_token"}
+
 
 class OpenCLI:
     """CLI processor."""
 
     def __init__(
-        self, source, history_path, output_format=formatter.JSON, headers=None, print_request_time=False
+        self, source, history_path, print_request_time, profile_name, output_format=formatter.JSON, headers=None
     ):
         """Initialize the CLI processor."""
         self.history_path = history_path
         self.output_format = output_format
         self.print_request_time = print_request_time
+        self.profile_name = profile_name
+        self.config_file_path = os.path.join(os.path.expanduser("~"), ".open-cli3-config/config.cfg")
 
         self.logger = logging.getLogger("open-cli3")
         self.logger.debug(
@@ -39,14 +45,34 @@ class OpenCLI:
 
         headers = self._parse_headers(headers)
 
+        # parse profile_name and/or source attributes
+        endpoint_opt = CONFIG_OPTIONS[0]
+        if profile_name:
+            config_obj = self._get_config_object(self.config_file_path)
+            endpoint = ""
+            if config_obj:
+                endpoint = self._get_option_from_config_obj(config_obj, endpoint_opt)
+            else:
+                self.logger.debug("You don't have open-cli3 config file, so we will use source attribute instead")
+                if source:
+                    endpoint = source
+                else:
+                    self.logger.debug("You don't have open-cli3 config file for profile name and you additionally "
+                                      "didn't provide source attribute instead")
+        elif source:
+            endpoint = source
+        else:
+            raise Exception("You should specify at least source or profile name (if exists) "
+                            "in order to run open-cli3. Check 'help' (-h, --help) for more information")
+
         # Handle non-url sources
         spec = None
-        if os.path.exists(source):
-            with open(source) as f:
+        if os.path.exists(endpoint):
+            with open(endpoint) as f:
                 spec = yaml.safe_load(f.read())
 
         if not spec:
-            spec = requests.get(source).json()
+            spec = requests.get(endpoint).json()
         self.client = OpenAPIExt(spec)
 
         # Get the CLI prompt name from the spec title
@@ -81,14 +107,20 @@ class OpenCLI:
     def execute(self, command):
         """Parse and execute the given command."""
         self.logger.debug("Invoke authentication")
-        try:
-            with open("current_auth_token.txt") as f:
-                access_token = f.read()
+        token_opt = CONFIG_OPTIONS[1]
+        config_obj = self._get_config_object(self.config_file_path)
+        if config_obj:
+            if self.profile_name:
+                access_token = self._get_option_from_config_obj(config_obj, token_opt)
                 if access_token:
                     for k in self.client.components.securitySchemes.keys():
                         self.client.authenticate(k, access_token)
-        except FileNotFoundError as e:
-            self.logger.debug(str(e))
+                else:
+                    self.logger.debug(f"You don't have access token for such profile name <{self.profile_name}> "
+                                      f"in your open-cli3 config file")
+        else:
+            self.logger.debug("You don't have open-cli3 config file")
+
         self.logger.debug("Parsing the input text %s", command)
         operation, arguments = self.command_parser.parse(text=command)
 
@@ -104,10 +136,14 @@ class OpenCLI:
                 access_token = response._raw_data.get("access_token")
                 expires_at = response._raw_data.get("expires_at")
                 if access_token and expires_at:
-                    with open("current_auth_token.txt", "w") as f:
-                        f.seek(0)
-                        f.write(access_token)
-                        f.truncate()
+                    section = self.profile_name if self.profile_name else DEFAULT_SECTION
+                    if not config_obj:
+                        config_obj = configparser.ConfigParser()
+                        config_obj.add_section(section)
+                    config_obj.set(section, token_opt, access_token)
+                    os.makedirs(os.path.dirname(self.config_file_path), exist_ok=True)
+                    with open(self.config_file_path, 'w') as configfile:
+                        config_obj.write(configfile)
 
         if isinstance(response, list):
             response = [r._raw_data for r in response]
@@ -126,6 +162,30 @@ class OpenCLI:
             return dict(header.split(":") for header in headers)
         except:
             raise ValueError("Invalid headers %s" % headers)
+
+    @staticmethod
+    def _get_config_object(conf_file_path):
+        config_obj = None
+        if os.path.exists(conf_file_path):
+            config = configparser.ConfigParser()
+            config.read_file(open(conf_file_path))
+            config_obj = config
+        return config_obj
+
+    def _get_option_from_config_obj(self, config_obj, option):
+        option_val = ""
+        if config_obj.has_section(self.profile_name) and config_obj.has_option(self.profile_name, option):
+            option_val = config_obj.get(self.profile_name, option)
+        else:
+            self.logger.debug(f"You don't have such profile name <{self.profile_name}> "
+                              f"in your open-cli3 config file. We wil try to use data from <{DEFAULT_SECTION}> "
+                              f"section of your open-cli3 config file")
+            if config_obj.has_section(DEFAULT_SECTION) and config_obj.has_option(DEFAULT_SECTION, option):
+                option_val = config_obj.get(DEFAULT_SECTION, option)
+            else:
+                self.logger.debug(f"Neither <{self.profile_name}> nor <{DEFAULT_SECTION}> sections are located "
+                                  f"in your open-cli3 config file")
+        return option_val
 
 
 if __name__ == "__main__":

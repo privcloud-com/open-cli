@@ -16,22 +16,63 @@ From the OpenAPI Specification project:
 
 To start a CLI session run:
 
-    docker run -it privcloud-com/open-cli3 <swagger-spec-url>
+    docker run -it privcloud-com/open-cli3 -s <swagger-spec-url>
 
 e.g:
 
-    docker run -it privcloud-com/open-cli3 http://petstore.swagger.io/v3/swagger.json
+    docker run -it privcloud-com/open-cli3 -s http://petstore.swagger.io/v3/swagger.json
 
+
+## CLI session
 
 To start a CLI session run:
 
-    open-cli3 <swagger-spec-url>
+    open-cli3 -s <swagger-spec-url>
 
 e.g:
 
-    open-cli3 https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/examples/v3.0/petstore-expanded.json
+    open-cli3 -s https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/examples/v3.0/petstore-expanded.json
 
-For more options run:
+Running CLI session will automatically create config file at path ```~/.open-cli3-config/config.cfg```
+
+To use profile config pass profile flag with desired profile name:
+
+    open-cli3 --profile <profile_name>
+
+e.g.:
+
+    open-cli3 --profile profile1
+
+This will work only if you specify profile in your open-cli3 config file: path ```~/.open-cli3-config/config.cfg```.
+Example of config file: 
+
+```config.cfg
+
+[profile1]
+endpoint = <endpoint>
+access_token = <access_token>
+
+``` 
+
+To get data without running CLI session, please specify ```-c``` flag. It will automatically execute specified command
+and return result data. Example: 
+    
+    ```open-cli3 -s <swagger-spec-url> -c 'auth:login --body.email=<user_email> --body.password=<user_password>'```
+
+or 
+    
+    ```open-cli3 --profile profile1 -c 'auth:login --body.email=<user_email> --body.password=<user_password>'```
+
+). 
+
+If a profile name (```--profile``` flag) and swagger url (```-s``` flag) are provided (example: 
+    
+    ```open-cli3 -s <swagger-spec-url> --profile profile1```
+    
+), the profile will take precedence. If such profile does not exist CLI will automatically create config file for the 
+profile.
+   
+For help run:
 
     open-cli3 -h
 

@@ -110,7 +110,7 @@ class OpenCLI:
         token_opt = CONFIG_OPTIONS[1]
         config_obj = self._get_config_object(self.config_file_path)
         if config_obj:
-            if self.profile_name:
+            if self.profile_name or DEFAULT_SECTION:
                 access_token = self._get_option_from_config_obj(config_obj, token_opt)
                 if access_token:
                     for k in self.client.components.securitySchemes.keys():
@@ -118,6 +118,8 @@ class OpenCLI:
                 else:
                     self.logger.debug(f"You don't have access token for such profile name <{self.profile_name}> "
                                       f"in your open-cli3 config file")
+            else:
+                self.logger.debug(f"You don't have profile name or 'DEFAULT' section in your open-cli3 config file")
         else:
             self.logger.debug("You don't have open-cli3 config file")
 
@@ -139,7 +141,8 @@ class OpenCLI:
                     section = self.profile_name if self.profile_name else DEFAULT_SECTION
                     if not config_obj:
                         config_obj = configparser.ConfigParser()
-                        config_obj.add_section(section)
+                        if section != DEFAULT_SECTION:
+                            config_obj.add_section(section)
                     config_obj.set(section, token_opt, access_token)
                     os.makedirs(os.path.dirname(self.config_file_path), exist_ok=True)
                     with open(self.config_file_path, 'w') as configfile:
@@ -180,7 +183,7 @@ class OpenCLI:
             self.logger.debug(f"You don't have such profile name <{self.profile_name}> "
                               f"in your open-cli3 config file. We wil try to use data from <{DEFAULT_SECTION}> "
                               f"section of your open-cli3 config file")
-            if config_obj.has_section(DEFAULT_SECTION) and config_obj.has_option(DEFAULT_SECTION, option):
+            if config_obj.defaults() and config_obj.has_option(DEFAULT_SECTION, option):
                 option_val = config_obj.get(DEFAULT_SECTION, option)
             else:
                 self.logger.debug(f"Neither <{self.profile_name}> nor <{DEFAULT_SECTION}> sections are located "

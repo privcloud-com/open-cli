@@ -57,24 +57,24 @@ access_token = <access_token>
 To get data without running CLI session, please specify ```-c``` flag. It will automatically execute specified command
 and return result data. Example: 
     
-    ```open-cli3 -s <swagger-spec-url> -c 'auth:login --body.email=<user_email> --body.password=<user_password>'```
+    open-cli3 -s <swagger-spec-url> -c 'auth:login --body.email=<user_email> --body.password=<user_password>'
 
 or 
     
-    ```open-cli3 --profile profile1 -c 'auth:login --body.email=<user_email> --body.password=<user_password>'```
+    open-cli3 --profile profile1 -c 'auth:login --body.email=<user_email> --body.password=<user_password>'
 
 ). 
 
 If a profile name (```--profile``` flag) and swagger url (```-s``` flag) are provided (example: 
     
-    ```open-cli3 -s <swagger-spec-url> --profile profile1```
+    open-cli3 -s <swagger-spec-url> --profile profile1
     
 ), the profile will take precedence. If such profile does not exist CLI will automatically create config file for the 
 profile.
 
 If you want to measure the request and response total time you should use ```--print-request-time``` flag. Example:
 
-    ```open-cli3 -s <swagger-spec-url> --print-request-time true```
+    open-cli3 -s <swagger-spec-url> --print-request-time true
    
 For help run:
 

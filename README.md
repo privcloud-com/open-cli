@@ -71,6 +71,10 @@ If a profile name (```--profile``` flag) and swagger url (```-s``` flag) are pro
     
 ), the profile will take precedence. If such profile does not exist CLI will automatically create config file for the 
 profile.
+
+If you want to measure the request and response total time you should use ```--print-request-time``` flag. Example:
+
+    ```open-cli3 -s <swagger-spec-url> --print-request-time true```
    
 For help run:
 

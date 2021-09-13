@@ -29,7 +29,7 @@ class OpenCLI:
     """CLI processor."""
 
     def __init__(
-        self, source, history_path, print_request_time, profile_name, output_format=formatter.JSON, headers=None
+        self, source, history_path, profile_name, print_request_time=False, output_format=formatter.JSON, headers=None
     ):
         """Initialize the CLI processor."""
         self.history_path = history_path
@@ -189,7 +189,3 @@ class OpenCLI:
                 self.logger.debug(f"Neither <{self.profile_name}> nor <{DEFAULT_SECTION}> sections are located "
                                   f"in your open-cli3 config file")
         return option_val
-
-
-if __name__ == "__main__":
-    OpenCLI("http://petstore.swagger.io/v2/swagger.json").run_loop()

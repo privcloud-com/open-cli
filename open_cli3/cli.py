@@ -110,16 +110,13 @@ class OpenCLI:
         token_opt = CONFIG_OPTIONS[1]
         config_obj = self._get_config_object(self.config_file_path)
         if config_obj:
-            if self.profile_name or DEFAULT_SECTION:
-                access_token = self._get_option_from_config_obj(config_obj, token_opt)
-                if access_token:
-                    for k in self.client.components.securitySchemes.keys():
-                        self.client.authenticate(k, access_token)
-                else:
-                    self.logger.debug(f"You don't have access token for such profile name <{self.profile_name}> "
-                                      f"in your open-cli3 config file")
+            access_token = self._get_option_from_config_obj(config_obj, token_opt)
+            if access_token:
+                for k in self.client.components.securitySchemes.keys():
+                    self.client.authenticate(k, access_token)
             else:
-                self.logger.debug(f"You don't have profile name or 'DEFAULT' section in your open-cli3 config file")
+                self.logger.debug(f"You don't have access token for such profile name <{self.profile_name}> or "
+                                  f"for 'DEFAULT' section in your open-cli3 config file")
         else:
             self.logger.debug("You don't have open-cli3 config file")
 

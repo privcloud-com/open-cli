@@ -11,6 +11,7 @@ From the OpenAPI Specification project:
 
 ![Alt Text](https://github.com/privcloud-com/open-cli/blob/master/demo.gif)
 ![Alt Text](https://github.com/privcloud-com/open-cli/blob/master/demo_table.gif)
+![Alt Text](https://github.com/privcloud-com/open-cli/blob/master/demo_profile.gif)
 
 ## Docker
 

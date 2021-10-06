@@ -54,11 +54,20 @@ class OpenCLI:
                 endpoint = self._get_option_from_config_obj(config_obj, endpoint_opt)
             else:
                 self.logger.debug("You don't have open-cli3 config file, so we will use source attribute instead")
-                if source:
-                    endpoint = source
-                else:
-                    self.logger.debug("You don't have open-cli3 config file for profile name and you additionally "
-                                      "didn't provide source attribute instead")
+                config_obj = configparser.ConfigParser()
+            if source:
+                endpoint = source
+            else:
+                self.logger.debug("You don't have open-cli3 config file for profile name and you additionally "
+                                    "didn't provide source attribute instead")
+            section = self.profile_name if self.profile_name else DEFAULT_SECTION
+            if section != DEFAULT_SECTION and not config_obj.has_section(section):
+                config_obj.add_section(section)
+            config_obj.set(section, endpoint_opt, endpoint)
+            os.makedirs(os.path.dirname(self.config_file_path), exist_ok=True)
+            with open(self.config_file_path, 'w') as configfile:
+                config_obj.write(configfile)
+
         elif source:
             endpoint = source
         else:

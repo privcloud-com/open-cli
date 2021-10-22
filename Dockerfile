@@ -32,5 +32,5 @@ ADD requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt
 
 # Copy & install packge
-COPY --from=build /open-cli3/dist/opencli.tar.gz /opencli3.tar.gz
+COPY --from=build /open-cli3/dist/opencli3.tar.gz /opencli3.tar.gz
 RUN pip install --no-cache --no-deps /opencli3.tar.gz

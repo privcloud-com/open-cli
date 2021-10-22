@@ -17,11 +17,11 @@ From the OpenAPI Specification project:
 
 To start a CLI session run:
 
-    docker run -it privcloud-com/open-cli3 -s <swagger-spec-url>
+    docker run -it privcloudcom/open-cli3 -s <swagger-spec-url>
 
 e.g:
 
-    docker run -it privcloud-com/open-cli3 -s http://petstore.swagger.io/v3/swagger.json
+    docker run -it privcloudcom/open-cli3 -s http://petstore.swagger.io/v3/swagger.json
 
 
 ## CLI session

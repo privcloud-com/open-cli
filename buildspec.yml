@@ -18,7 +18,6 @@ phases:
       - python3 -m pip install --upgrade build
       - python3 -m pip install --upgrade twine
       - python3 -m build
-      - echo "[pypi]\n  username = __token__\n  password = ${PYPI_TOKEN}" > ~/.pypirc
   post_build:
     commands:
       - docker push $PRODUCT_NAME:$IMAGE_TAG

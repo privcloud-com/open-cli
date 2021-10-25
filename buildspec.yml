@@ -15,8 +15,13 @@ phases:
       - echo "Building image ${PRODUCT_NAME}:${IMAGE_TAG}..."
       - docker build -t $PRODUCT_NAME:$IMAGE_TAG -f Dockerfile .
       - echo "Image build completed at `date`"
+      - python3 -m pip install --upgrade build
+      - python3 -m pip install --upgrade twine
+      - python3 -m build
+      - echo "[pypi]\n  username = __token__\n  password = ${PYPI_TOKEN}" > ~/.pypirc
   post_build:
     commands:
       - docker push $PRODUCT_NAME:$IMAGE_TAG
       - docker pushrm $PRODUCT_NAME:$IMAGE_TAG
+      - python3 -m twine upload --repository pypi dist/
 

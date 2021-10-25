@@ -1,4 +1,4 @@
-# OpenCLI
+# Open-CLI3
 ![Build Status](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiR2ZJNFp4S243bmNBVW13VGRuQkNndGRuVVRiK2tzSDhGRkcyQ1BhRWdCZXlnaGI0T2E5MlJ0dElzbjFqNEY5ZHFZcDdKYS9JT0h1SmVLdjF3Q1RDUnVZPSIsIml2UGFyYW1ldGVyU3BlYyI6Im9sdXhWQnh5K2FoMWI5NnYiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master)
 
 A CLI for every service which exposes a OpenAPI (Swagger) specification endpoint.

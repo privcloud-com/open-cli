@@ -23,5 +23,5 @@ phases:
     commands:
       - docker push $PRODUCT_NAME:$IMAGE_TAG
       - docker pushrm $PRODUCT_NAME:$IMAGE_TAG
-      - python3 -m twine upload --repository pypi dist/
+      - python3 -m twine upload --repository pypi dist/*
 

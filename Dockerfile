@@ -18,7 +18,7 @@ COPY requirements.txt /open-cli3/requirements.txt
 COPY open_cli3/*.py /open-cli3/open_cli3/
 
 # Build the package and set its name
-RUN python setup.py sdist && mv dist/opencli*.tar.gz dist/opencli3.tar.gz
+RUN python setup.py sdist && mv dist/open-cli*.tar.gz dist/open-cli3.tar.gz
 
 # -----------------------------------------------------------------------
 

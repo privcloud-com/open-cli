@@ -23,6 +23,12 @@ e.g:
 
     docker run -it privcloudcom/open-cli3 -s http://petstore.swagger.io/v3/swagger.json
 
+## PIP
+
+To install locally via PIP run:
+
+    pip3 install open-cli3
+
 
 ## CLI session
 
